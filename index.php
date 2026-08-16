@@ -1,5 +1,5 @@
 <?php include 'header.php'; ?>
-<?php include 'config.php'; ?>
+<?php include_once 'config.php'; ?>
 
 <div class="hero-section">
     <div class="container">
@@ -16,11 +16,11 @@
         <?php
         $database = new Database();
         $db = $database->getConnection();
-        
+
         $query = "SELECT * FROM categories";
         $stmt = $db->prepare($query);
         $stmt->execute();
-        
+
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
             echo '
             <div class="col-md-4">

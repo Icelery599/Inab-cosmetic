@@ -1,12 +1,12 @@
 <?php include 'header.php'; ?>
-<?php include 'config.php'; ?>
+<?php include_once 'config.php'; ?>
 
 <?php
 // Handle cart actions
 if ($_POST) {
     if (isset($_POST['action'])) {
         $product_id = $_POST['product_id'];
-        
+
         switch ($_POST['action']) {
             case 'add':
                 $quantity = $_POST['quantity'];
@@ -15,8 +15,9 @@ if ($_POST) {
                 } else {
                     $_SESSION['cart'][$product_id] = $quantity;
                 }
+                logPublicUserActivity('cart_add', 'Added product from cart page', $product_id);
                 break;
-                
+
             case 'update':
                 $quantity = $_POST['quantity'];
                 if ($quantity <= 0) {
@@ -24,10 +25,12 @@ if ($_POST) {
                 } else {
                     $_SESSION['cart'][$product_id] = $quantity;
                 }
+                logPublicUserActivity('cart_update', 'Updated cart quantity to ' . intval($quantity), $product_id);
                 break;
-                
+
             case 'remove':
                 unset($_SESSION['cart'][$product_id]);
+                logPublicUserActivity('cart_remove', 'Removed product from cart', $product_id);
                 break;
         }
     }
@@ -39,17 +42,17 @@ $cart_items = [];
 if (!empty($_SESSION['cart'])) {
     $database = new Database();
     $db = $database->getConnection();
-    
+
     $placeholders = str_repeat('?,', count($_SESSION['cart']) - 1) . '?';
     $query = "SELECT * FROM products WHERE id IN ($placeholders)";
     $stmt = $db->prepare($query);
     $stmt->execute(array_keys($_SESSION['cart']));
-    
+
     while ($product = $stmt->fetch(PDO::FETCH_ASSOC)) {
         $quantity = $_SESSION['cart'][$product['id']];
         $subtotal = $product['price'] * $quantity;
         $total += $subtotal;
-        
+
         $cart_items[] = [
             'product' => $product,
             'quantity' => $quantity,
@@ -61,7 +64,7 @@ if (!empty($_SESSION['cart'])) {
 
 <div class="container mt-4">
     <h2>Shopping Cart</h2>
-    
+
     <?php if (empty($cart_items)): ?>
         <div class="alert alert-info">
             Your cart is empty. <a href="products.php">Continue shopping</a>
@@ -88,8 +91,8 @@ if (!empty($_SESSION['cart'])) {
                                 <form method="post" class="d-inline">
                                     <input type="hidden" name="product_id" value="<?php echo $item['product']['id']; ?>">
                                     <input type="hidden" name="action" value="update">
-                                    <input type="number" name="quantity" value="<?php echo $item['quantity']; ?>" 
-                                           min="1" max="<?php echo $item['product']['stock_quantity']; ?>" 
+                                    <input type="number" name="quantity" value="<?php echo $item['quantity']; ?>"
+                                           min="1" max="<?php echo $item['product']['stock_quantity']; ?>"
                                            class="form-control form-control-sm" style="width: 80px;" onchange="this.form.submit()">
                                 </form>
                             </td>
@@ -106,7 +109,7 @@ if (!empty($_SESSION['cart'])) {
                     </tbody>
                 </table>
             </div>
-            
+
             <div class="col-md-4">
                 <div class="card">
                     <div class="card-header">
@@ -117,13 +120,13 @@ if (!empty($_SESSION['cart'])) {
                         <p>Shipping: $<?php echo $total > 50 ? '0.00' : '5.99'; ?></p>
                         <hr>
                         <h6>Total: $<?php echo number_format($total > 50 ? $total : $total + 5.99, 2); ?></h6>
-                        
+
                         <?php if ($total < 50): ?>
                             <div class="alert alert-warning mt-3">
                                 Add $<?php echo number_format(50 - $total, 2); ?> more for free shipping!
                             </div>
                         <?php endif; ?>
-                        
+
                         <a href="checkout.php" class="btn btn-success btn-lg w-100 mt-3">Proceed to Checkout</a>
                     </div>
                 </div>

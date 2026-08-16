@@ -1,9 +1,9 @@
 <?php include 'header.php'; ?>
-<?php include 'config.php'; ?>
+<?php include_once 'config.php'; ?>
 
 <div class="container mt-4">
     <h2>Our Products</h2>
-    
+
     <!-- Search and Filter -->
     <div class="row mb-4">
         <div class="col-md-6">
@@ -44,11 +44,11 @@
                     <?php
                     $database = new Database();
                     $db = $database->getConnection();
-                    
+
                     $query = "SELECT * FROM categories";
                     $stmt = $db->prepare($query);
                     $stmt->execute();
-                    
+
                     while ($category = $stmt->fetch(PDO::FETCH_ASSOC)) {
                         $active = (isset($_GET['category']) && $_GET['category'] == $category['id']) ? 'active' : '';
                         echo '<a href="products.php?category=' . $category['id'] . '" class="list-group-item ' . $active . '">' . $category['name'] . '</a>';
@@ -56,7 +56,7 @@
                     ?>
                 </div>
             </div>
-            
+
             <!-- Price Range Filter -->
             <div class="card mt-3">
                 <div class="card-header">
@@ -83,33 +83,33 @@
                     <span class="visually-hidden">Loading...</span>
                 </div>
             </div>
-            
+
             <div class="row" id="productsGrid">
                 <?php
                 $whereClause = "";
                 $params = [];
-                
+
                 if (isset($_GET['category']) && !empty($_GET['category'])) {
                     $whereClause = "WHERE p.category_id = ?";
                     $params[] = $_GET['category'];
                 }
-                
-                $query = "SELECT p.*, c.name as category_name 
-                         FROM products p 
-                         LEFT JOIN categories c ON p.category_id = c.id 
-                         $whereClause 
+
+                $query = "SELECT p.*, c.name as category_name
+                         FROM products p
+                         LEFT JOIN categories c ON p.category_id = c.id
+                         $whereClause
                          ORDER BY p.created_at DESC";
-                
+
                 $stmt = $db->prepare($query);
                 $stmt->execute($params);
-                
+
                 if ($stmt->rowCount() > 0) {
                     while ($product = $stmt->fetch(PDO::FETCH_ASSOC)) {
                         echo '
                         <div class="col-lg-4 col-md-6 mb-4 product-card position-relative" data-price="' . $product['price'] . '" data-name="' . strtolower($product['name']) . '">
                             <div class="card h-100">
                                 ' . (intval($product['stock_quantity']) <= 0 ? '<span class="stock-badge">Out of stock</span>' : '') . '
-                                <img src="https://via.placeholder.com/300x200?text=' . urlencode($product['name']) . '" 
+                                <img src="https://via.placeholder.com/300x200?text=' . urlencode($product['name']) . '"
                                      class="card-img-top product-image" alt="' . $product['name'] . '">
                                 <div class="card-body">
                                     <h5 class="card-title">' . $product['name'] . '</h5>
@@ -152,7 +152,7 @@
     function searchProducts() {
         const searchTerm = document.getElementById('searchInput').value.toLowerCase();
         const productCards = document.querySelectorAll('.product-card');
-        
+
         productCards.forEach(card => {
             const productName = card.getAttribute('data-name');
             if (productName.includes(searchTerm)) {
@@ -168,13 +168,13 @@
         const sortBy = document.getElementById('sortSelect').value;
         const productsGrid = document.getElementById('productsGrid');
         const productCards = Array.from(document.querySelectorAll('.product-card'));
-        
+
         productCards.sort((a, b) => {
             const priceA = parseFloat(a.getAttribute('data-price'));
             const priceB = parseFloat(b.getAttribute('data-price'));
             const nameA = a.getAttribute('data-name');
             const nameB = b.getAttribute('data-name');
-            
+
             switch (sortBy) {
                 case 'name_asc':
                     return nameA.localeCompare(nameB);
@@ -188,7 +188,7 @@
                     return 0;
             }
         });
-        
+
         // Re-append sorted cards
         productCards.forEach(card => productsGrid.appendChild(card));
     }
@@ -198,7 +198,7 @@
         const minPrice = parseFloat(document.getElementById('minPrice').value);
         const maxPrice = parseFloat(document.getElementById('maxPrice').value);
         const productCards = document.querySelectorAll('.product-card');
-        
+
         productCards.forEach(card => {
             const price = parseFloat(card.getAttribute('data-price'));
             if (price >= minPrice && price <= maxPrice) {
@@ -221,11 +221,11 @@
     // AJAX add to cart
     document.addEventListener('DOMContentLoaded', function() {
         const addToCartForms = document.querySelectorAll('.add-to-cart-form');
-        
+
         addToCartForms.forEach(form => {
             form.addEventListener('submit', function(e) {
                 e.preventDefault();
-                
+
                 const formData = new FormData(this);
                 const addToCartBtn = this.querySelector('.add-to-cart-btn') || this.querySelector('button[type="submit"]');
 
@@ -234,7 +234,7 @@
                     addToCartBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
                     addToCartBtn.disabled = true;
                 }
-                
+
                 fetch('ajax_add_to_cart.php', {
                     method: 'POST',
                     body: formData
@@ -280,7 +280,7 @@
     });
 
     // Real-time search with debounce
-    document.getElementById('searchInput').addEventListener('input', 
+    document.getElementById('searchInput').addEventListener('input',
         debounce(searchProducts, 300)
     );
 </script>

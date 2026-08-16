@@ -1,6 +1,9 @@
 <?php
-include 'config.php';
-session_start();
+include_once 'config.php';
+include_once 'activity_logger.php';
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
 if ($_POST && isset($_POST['product_id']) && isset($_POST['action']) && $_POST['action'] == 'add') {
     $product_id = intval($_POST['product_id']);
@@ -50,6 +53,8 @@ if ($_POST && isset($_POST['product_id']) && isset($_POST['action']) && $_POST['
     } else {
         $_SESSION['cart'][$product_id] = $quantity;
     }
+
+    logPublicUserActivity('add_to_cart', 'Added product to cart via product listing', $product_id);
 
     // Return JSON response
     header('Content-Type: application/json');

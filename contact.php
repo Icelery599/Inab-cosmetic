@@ -2,7 +2,7 @@
 
 <div class="container mt-4">
     <h2>Contact Us</h2>
-    
+
     <div class="row">
         <div class="col-md-8">
             <div class="card">
@@ -38,7 +38,7 @@
                 </div>
             </div>
         </div>
-        
+
         <div class="col-md-4">
             <div class="card">
                 <div class="card-header bg-primary text-white">
@@ -49,15 +49,15 @@
                         123 Beauty Street<br>
                         Cosmetic City, CC 12345
                     </p>
-                    
+
                     <p><i class="fas fa-phone"></i> <strong>Phone:</strong><br>
                         (555) 123-4567
                     </p>
-                    
+
                     <p><i class="fas fa-envelope"></i> <strong>Email:</strong><br>
                         info@glamourbeauty.com
                     </p>
-                    
+
                     <p><i class="fas fa-clock"></i> <strong>Business Hours:</strong><br>
                         Mon-Fri: 9AM-8PM<br>
                         Sat: 9AM-6PM<br>
@@ -65,7 +65,7 @@
                     </p>
                 </div>
             </div>
-            
+
             <div class="card mt-3">
                 <div class="card-body">
                     <h6>Follow Us</h6>
