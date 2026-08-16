@@ -88,3 +88,22 @@ INSERT INTO promotions (code, description, discount_percent, min_order_amount, v
 ('WELCOME10', 'Get 10% off on your first order', 10.00, 30.00, '2024-12-31'),
 ('BEAUTY20', '20% off on orders above $100', 20.00, 100.00, '2024-11-30'),
 ('FREESHIP', 'Free shipping on orders above $50', 0.00, 50.00, '2024-10-31');
+
+-- Public user activity table
+CREATE TABLE public_user_activities (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    session_id VARCHAR(64) NOT NULL,
+    activity_type VARCHAR(100) NOT NULL,
+    activity_details TEXT,
+    page_url VARCHAR(500),
+    product_id INT NULL,
+    order_id INT NULL,
+    ip_address VARCHAR(45),
+    user_agent VARCHAR(500),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_session_id (session_id),
+    INDEX idx_activity_type (activity_type),
+    INDEX idx_created_at (created_at),
+    FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE SET NULL,
+    FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE SET NULL
+);

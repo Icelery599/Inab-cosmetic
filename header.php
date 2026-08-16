@@ -7,6 +7,13 @@ if (!isset($_SESSION['cart'])) {
     $_SESSION['cart'] = [];
 }
 
+include_once 'config.php';
+include_once 'activity_logger.php';
+$currentScript = basename($_SERVER['SCRIPT_NAME'] ?? '');
+if ($currentScript !== 'admin_dashboard.php') {
+    logPublicUserActivity('page_view');
+}
+
 // Calculate total items in cart
 $totalItems = !empty($_SESSION['cart']) ? array_sum($_SESSION['cart']) : 0;
 ?>
@@ -120,7 +127,7 @@ $totalItems = !empty($_SESSION['cart']) ? array_sum($_SESSION['cart']) : 0;
                 <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
             </div>
         </div>
-        
+
         <div class="toast align-items-center text-white bg-danger border-0" id="errorToast">
             <div class="d-flex">
                 <div class="toast-body" id="errorMessage"></div>
@@ -147,10 +154,11 @@ $totalItems = !empty($_SESSION['cart']) ? array_sum($_SESSION['cart']) : 0;
                     <li class="nav-item"><a class="nav-link" href="products.php">All Products</a></li>
                     <li class="nav-item"><a class="nav-link" href="opening_hours.php">Opening Hours</a></li>
                     <li class="nav-item"><a class="nav-link" href="contact.php">Contact</a></li>
+                    <li class="nav-item"><a class="nav-link" href="admin_dashboard.php">Admin</a></li>
                 </ul>
                 <div class="navbar-nav position-relative">
                     <a class="nav-link cart-icon" href="cart.php" onmouseover="showCartPreview()" onmouseout="hideCartPreview()">
-                        <i class="fas fa-shopping-cart"></i> Cart 
+                        <i class="fas fa-shopping-cart"></i> Cart
                         <span class="badge bg-danger" id="cartCount"><?php echo array_sum($_SESSION['cart']); ?></span>
                     </a>
                     <div class="cart-preview" id="cartPreview" onmouseover="showCartPreview()" onmouseout="hideCartPreview()">
@@ -172,7 +180,7 @@ $totalItems = !empty($_SESSION['cart']) ? array_sum($_SESSION['cart']) : 0;
         function showToast(message, type = 'success') {
             const toastElement = type === 'success' ? document.getElementById('successToast') : document.getElementById('errorToast');
             const messageElement = type === 'success' ? document.getElementById('successMessage') : document.getElementById('errorMessage');
-            
+
             messageElement.textContent = message;
             const toast = new bootstrap.Toast(toastElement);
             toast.show();
@@ -224,7 +232,7 @@ $totalItems = !empty($_SESSION['cart']) ? array_sum($_SESSION['cart']) : 0;
         function validateForm(form) {
             const inputs = form.querySelectorAll('input[required], textarea[required]');
             let isValid = true;
-            
+
             inputs.forEach(input => {
                 if (!input.value.trim()) {
                     input.classList.add('is-invalid');
@@ -233,7 +241,7 @@ $totalItems = !empty($_SESSION['cart']) ? array_sum($_SESSION['cart']) : 0;
                     input.classList.remove('is-invalid');
                 }
             });
-            
+
             return isValid;
         }
 

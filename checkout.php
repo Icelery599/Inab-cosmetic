@@ -1,5 +1,5 @@
 <?php include 'header.php'; ?>
-<?php include 'config.php'; ?>
+<?php include_once 'config.php'; ?>
 
 <?php
 if (empty($_SESSION['cart'])) {
@@ -11,7 +11,7 @@ if (empty($_SESSION['cart'])) {
 if ($_POST && isset($_POST['place_order'])) {
     $database = new Database();
     $db = $database->getConnection();
-    
+
     try {
         $db->beginTransaction();
 
@@ -84,6 +84,8 @@ if ($_POST && isset($_POST['place_order'])) {
             $update_stmt->execute([$p['quantity'], $p['id']]);
         }
 
+        logPublicUserActivity('checkout_completed', 'Placed order #' . $order_id, null, $order_id);
+
         $db->commit();
 
         // Clear cart and show success message
@@ -99,7 +101,7 @@ if ($_POST && isset($_POST['place_order'])) {
 
 <div class="container mt-4">
     <h2>Checkout</h2>
-    
+
     <?php if (isset($success)): ?>
         <div class="alert alert-success">
             <h4>Order Placed Successfully!</h4>
@@ -107,10 +109,11 @@ if ($_POST && isset($_POST['place_order'])) {
             <a href="products.php" class="btn btn-primary">Continue Shopping</a>
         </div>
     <?php else: ?>
+        <?php logPublicUserActivity('checkout_started', 'Viewed checkout form'); ?>
         <?php if (isset($error)): ?>
             <div class="alert alert-danger"><?php echo $error; ?></div>
         <?php endif; ?>
-        
+
         <div class="row">
             <div class="col-md-8">
                 <div class="card">
@@ -139,7 +142,7 @@ if ($_POST && isset($_POST['place_order'])) {
                                     <textarea name="address" class="form-control" required></textarea>
                                 </div>
                             </div>
-                            
+
                             <div class="card mt-4">
                                 <div class="card-header">
                                     <h5>Payment Information</h5>
@@ -161,13 +164,13 @@ if ($_POST && isset($_POST['place_order'])) {
                                     </div>
                                 </div>
                             </div>
-                            
+
                             <button type="submit" name="place_order" class="btn btn-success btn-lg w-100 mt-4">Place Order</button>
                         </form>
                     </div>
                 </div>
             </div>
-            
+
             <div class="col-md-4">
                 <div class="card">
                     <div class="card-header">
@@ -185,10 +188,10 @@ if ($_POST && isset($_POST['place_order'])) {
                             $product = $stmt->fetch(PDO::FETCH_ASSOC);
                             $item_total = $product['price'] * $quantity;
                             $subtotal += $item_total;
-                            
+
                             echo '<p>' . $product['name'] . ' x ' . $quantity . ' - $' . number_format($item_total, 2) . '</p>';
                         }
-                        
+
                         $shipping = $subtotal > 50 ? 0 : 5.99;
                         $total = $subtotal + $shipping;
                         ?>
@@ -198,7 +201,7 @@ if ($_POST && isset($_POST['place_order'])) {
                         <h6>Total: $<?php echo number_format($total, 2); ?></h6>
                     </div>
                 </div>
-                
+
                 <div class="card mt-3">
                     <div class="card-body">
                         <h6>Special Offers</h6>
